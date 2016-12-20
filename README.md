@@ -14,7 +14,7 @@ Contributing
 
 ECAM 2016
 
-Othman Mejdoubi & Zakariya CHIHI
+Othman MEJDOUBI & Zakariya CHIHI
 
 License
 -------
