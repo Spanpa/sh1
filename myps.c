@@ -297,6 +297,9 @@ if(invalid_option == 0){
 	else if(do_all == 0 && do_u == 1){
 		ps_u();
 	}
+    else if(do_all == 1 && do_u == 1){
+        ps_u();
+    }
 	else if(do_all == 0 && do_u == 0){
 		ps();
 	}
