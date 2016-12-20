@@ -167,7 +167,7 @@ void ls_l(void){
     do{
         n = syscall(SYS_getdents, fd, buf, 1024);
         if(n == -1){
-            printf("Error : Unknown directory.");
+            printf("Error : Unknown directory.\n");
         }
         for (int i = 0; i < n;) {
             strncpy(full_path, file_path, 254);
@@ -329,7 +329,7 @@ void ls_lR(char *path){
                     strcat(full_path, "/");
                     strcat(full_path, namelist->d_name);
                 }
-
+                file_stat();
                 if(d_type == 4){
                     printf(BLUE BOLD    "%s "     RESET, namelist->d_name);
                     directories[j] = malloc(64 * sizeof(char));
@@ -414,7 +414,7 @@ void ls_al(void){
     do{
         n = syscall(SYS_getdents, fd, buf, 1024);
         if(n == -1){
-            printf("Error : Unknown directory.");
+            printf("Error : Unknown directory.\n");
         }
         for (int i = 0; i < n;) {
             strncpy(full_path, file_path, 254);

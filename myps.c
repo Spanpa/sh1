@@ -5,7 +5,7 @@
 	3 options :
     	-a, --all 		print all processes except processes not associated with a terminal
     	-h, --help      display the help  
-    	-u 		  		display with a long listing format */
+    	-u 		  		display all terminal processes with a long listing format */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,6 +47,7 @@ struct ttyids {
 
 int c;
 int do_all = 0;
+int do_help = 0;
 int do_u = 0;
 int invalid_option = 0; 
 
@@ -113,6 +114,8 @@ struct ttyids who(void){
 }
 
 void ps(void){
+    char *dev_tty;
+    char *current_tty;
 	struct ttyids t = who();
 	// open proc directory and get the file descriptor
 	fd_proc = open(proc, O_RDONLY | O_DIRECTORY);
@@ -142,12 +145,22 @@ void ps(void){
             			read(fd, buffer, sizeof(buffer));
             			// split the buffer into fields in stat_infos
             			stat_infos = split_buffer(buffer);
+                        // get the pathname of current tty
+                        if ((dev_tty = ttyname(STDIN_FILENO)) == NULL)
+                            perror("ttyname() error");
+                        else {
+                            current_tty = strtok(dev_tty, "/dev/");
+                            //printf("%s ", current_tty);
+                        }
             			// walk through session ids retrived from who()
             			for(int k = 0; k < j; k++){
-            				// print only the processes that have the same session id
+            				// use only the processes that are user processes from all terminals
             				if(strcmp(t.ids[k], stat_infos[5]) == 0){
-            					// print process id, tty name, command name
-            					printf("%s    %s    %s\n", stat_infos[0], t.ttys[k], stat_infos[1]);
+                                // print only the processes that are connected to the current terminal tty
+                                if(strcmp(t.ttys[k], current_tty) == 0){
+                                    // print process id, tty name, command name
+                                    printf("%s    %s    %s\n", stat_infos[0], t.ttys[k], stat_infos[1]);
+                                }
             				}
             			}
 						close(fd);
@@ -238,7 +251,11 @@ void help(void){
     printf(BOLD "DESCRIPTION\n" RESET);
     printf("    Report a snapshot of the current processes.\n\n");
     printf(BOLD "    -a, --all " RESET);
-    printf("print all processes\n\n");
+    printf("print all processes except processes not associated with a terminal\n\n");
+    printf(BOLD "    -h, --help " RESET);
+    printf("display this help and exit\n\n");
+    printf(BOLD "    -u " RESET);
+    printf("display all terminal processes with a long listing format\n\n");
     printf("    Written by ");
     printf(BOLD YELLOW"Othman MEJDOUBI " RESET);
     printf("& ");
@@ -246,11 +263,14 @@ void help(void){
     printf("\n\n");
 }
 
-while ((c = getopt_long (argc, argv, "au", longopts, NULL)) != -1) {
+while ((c = getopt_long (argc, argv, "ahu", longopts, NULL)) != -1) {
 	switch (c) {
 	case 'a':
 		do_all = 1;
 		break ;
+    case 'h':
+        do_help = 1;
+        break ;
 	case 'u':
 		do_u = 1;
 		break ;
@@ -268,13 +288,16 @@ while ((c = getopt_long (argc, argv, "au", longopts, NULL)) != -1) {
 }
 
 if(invalid_option == 0){
-	if(do_all == 1 && do_u == 0){
+    if(do_help == 1){
+        help();
+    }
+	else if(do_all == 1 && do_u == 0){
 		ps_a();
 	}
 	else if(do_all == 0 && do_u == 1){
 		ps_u();
 	}
-	else{
+	else if(do_all == 0 && do_u == 0){
 		ps();
 	}
 }
