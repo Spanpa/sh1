@@ -2,13 +2,12 @@ sh1
 ===
 
 sh1 is a simple implementation of a shell in C.
-It includes the following limitations :
+It includes the following spec/limitations :
 
+* Interactive and batch modes available.
 * Commands must be on a single line.
 * Arguments must be separated by whitespace.
-* No quoting arguments or escaping whitespace.
-* No piping or redirection.
-* Only builtins are: `cd`, `help`, `exit`.
+* Only builtins are: `myls`, `myps`, `myrm`, `mywho`, `mypwd`, `help`, `exit`.
 
 Contributing
 ------------
