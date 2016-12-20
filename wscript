@@ -18,4 +18,3 @@ def build(bld):
         bld.program(source="/"+f,
                     target="/"+splitext(f)[0],
                     cflags=flags)
-
