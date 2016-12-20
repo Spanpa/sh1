@@ -19,6 +19,6 @@ Othman Mejdoubi & Zakariya CHIHI
 License
 -------
 
-This code is in the public domain (see [UNLICENSE](UNLICENSE) for more details).
+This code is in the public domain.
 This means you can use, modify, and distribute it without any restriction.  I
 appreciate, but don't require, acknowledgement in derivative works.
