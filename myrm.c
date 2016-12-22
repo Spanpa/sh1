@@ -1,5 +1,5 @@
 /*  ECAM 2016
-    Othman MEJDOUBI & Zakariya CHIHI
+    Othman MEJDOUBI & Zakaria CHIHI
     myrm : remove files
     usage : myrm [option]... [file]...
     3 options :

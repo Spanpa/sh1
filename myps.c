@@ -1,5 +1,5 @@
 /*  ECAM 2016
-	Othman MEJDOUBI & Zakariya CHIHI
+	Othman MEJDOUBI & Zakaria CHIHI
 	myps : report a snapshot of the current processes.
 	usage : myps [options]
 	3 options :

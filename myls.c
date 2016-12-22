@@ -1,5 +1,5 @@
 /*  ECAM 2016
-    Othman MEJDOUBI & Zakariya CHIHI
+    Othman MEJDOUBI & Zakaria CHIHI
     myls : list directory contents.
     usage : myls [option]... [file]...
     4 options :

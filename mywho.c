@@ -1,5 +1,5 @@
 /*  ECAM 2016
-	Othman MEJDOUBI & Zakariya CHIHI
+	Othman MEJDOUBI & Zakaria CHIHI
 	mywho : Print information about users who are currently logged in.
 	usage : mywho [option]
 	8 options(including 5 additional) :

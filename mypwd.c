@@ -1,5 +1,5 @@
 /*  ECAM 2016
-    Othman MEJDOUBI & Zakariya CHIHI
+    Othman MEJDOUBI & Zakaria CHIHI
     mypwd : print name of current/working directory.
     usage : mypwd [option]
     1 option :

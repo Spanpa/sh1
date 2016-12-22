@@ -1,5 +1,5 @@
 /*  ECAM 2016
-	Othman MEJDOUBI & Zakariya CHIHI
+	Othman MEJDOUBI & Zakaria CHIHI
 	sh1 is a simple implementation of a shell in C. 
 	It includes the following spec/limitations :
 		Interactive and batch modes available.
