@@ -68,7 +68,7 @@ void rm(void){
 void rm_verbose(void){
     if(rm_value != NULL){
         if (is_regular_file(rm_value)){
-            // deletes the file give its pathname
+            // deletes the file given its pathname
             unlk = unlink(rm_value);
             if(unlk == 0){
                 // displays the name of the file that was removed
@@ -96,7 +96,7 @@ void rm_interactive(void){
             printf("myrm: remove regular file '%s'? (y/n) ", rm_value);
             scanf(" %c", &confirm);
             if(confirm == 'y'){            
-                // deletes the file give its pathname
+                // deletes the file given its pathname
                 unlk = unlink(rm_value);
                 if(unlk == 0){
                     // keep going
