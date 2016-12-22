@@ -1,6 +1,6 @@
 /*  ECAM 2016
     Othman MEJDOUBI & Zakariya CHIHI
-    myrm : remove files or directories
+    myrm : remove files
     usage : myrm [option]... [file]...
     3 options :
         -i, --interactive  prompt before every removal
@@ -46,7 +46,7 @@ int is_regular_file(char *path){
 void rm(void){
     if(rm_value != NULL){
         if (is_regular_file(rm_value)){
-            // deletes the file give its pathname
+            // deletes the file given its pathname
             unlk = unlink(rm_value);
             if(unlk == 0){
                 // keep going
