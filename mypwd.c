@@ -22,8 +22,8 @@ int do_help = 0;
 int invalid_option = 0;
 
 struct option longopts [] = {
-	{ "help", no_argument , NULL , 'h' },
-	{ 0, 0, 0, 0 }
+    { "help", no_argument , NULL , 'h' },
+    { 0, 0, 0, 0 }
 };
 
 void pwd(void){
@@ -52,30 +52,30 @@ void help(void){
 }
 
 while ((c = getopt_long (argc, argv, "h", longopts, NULL)) != -1) {
-	switch (c) {
-	case 'h':
-		do_help = 1;
-		break ;
-	case 0: /* getopt_long () set a variable , just keep going */
-		break ;
-	case '?':
-	default : /* invalid option */
-		fprintf (stderr, "%s: option ‘-%c’ is invalid : ignored, try --help to get the command syntax.  \n",
-		argv[1], optopt);
-		invalid_option = 1;
-		break ;
-	case -1:
-		break;
-	}
+    switch (c) {
+    case 'h':
+        do_help = 1;
+        break ;
+    case 0: /* getopt_long () set a variable , just keep going */
+        break ;
+    case '?':
+    default : /* invalid option */
+        fprintf (stderr, "%s: option ‘-%c’ is invalid : ignored, try --help to get the command syntax.  \n",
+        argv[1], optopt);
+        invalid_option = 1;
+        break ;
+    case -1:
+        break;
+    }
 }
 
 if(invalid_option == 0){
-	if(do_help == 1){
-    	help();
-	}
-	else{
-    	pwd();
-	}
+    if(do_help == 1){
+        help();
+    }
+    else{
+        pwd();
+    }
 }
 
 }

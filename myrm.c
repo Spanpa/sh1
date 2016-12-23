@@ -29,10 +29,10 @@ int do_verbose = 0;
 int invalid_option = 0;
 
 struct option longopts [] = {
-	{ "interactive", optional_argument , NULL , 'i' },
-	{ "help", no_argument , NULL , 'h' },
+    { "interactive", optional_argument , NULL , 'i' },
+    { "help", no_argument , NULL , 'h' },
     { "verbose", optional_argument , NULL , 'v' },
-	{ 0, 0, 0, 0 }
+    { 0, 0, 0, 0 }
 };
 
 /* Check if a file given its pathname is a regular file */
@@ -136,29 +136,29 @@ void help(void){
 }
 
 while ((c = getopt_long (argc, argv, "hiv", longopts, NULL)) != -1) {
-	switch (c) {
+    switch (c) {
     case 'h':
         do_help = 1;
         break ;
-	case 'i':
-		do_interactive = 1;
-		rm_value = argv[2];
-		break ;
+    case 'i':
+        do_interactive = 1;
+        rm_value = argv[2];
+        break ;
     case 'v':
         do_verbose = 1;
         rm_value = argv[2];
         break ;
-	case 0: /* getopt_long () set a variable , just keep going */
-		break ;
-	case '?':
-	default : /* invalid option */
-		fprintf (stderr, "%s: option ‘-%c’ is invalid : ignored, try --help to get the command syntax.  \n",
-		argv[1], optopt);
+    case 0: /* getopt_long () set a variable , just keep going */
+        break ;
+    case '?':
+    default : /* invalid option */
+        fprintf (stderr, "%s: option ‘-%c’ is invalid : ignored, try --help to get the command syntax.  \n",
+        argv[1], optopt);
         invalid_option = 1;
-		break ;
-	case -1:
-		break;
-	}
+        break ;
+    case -1:
+        break;
+    }
 }
 
 if(invalid_option == 0){

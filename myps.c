@@ -1,11 +1,11 @@
 /*  ECAM 2016
-	Othman MEJDOUBI & Zakaria CHIHI
-	myps : report a snapshot of the current processes.
-	usage : myps [options]
-	3 options :
-    	-a, --all 		print all processes except processes not associated with a terminal
-    	-h, --help      display the help  
-    	-u 		  		display all terminal processes with a long listing format */
+    Othman MEJDOUBI & Zakaria CHIHI
+    myps : report a snapshot of the current processes.
+    usage : myps [options]
+    3 options :
+        -a, --all       print all processes except processes not associated with a terminal
+        -h, --help      display the help  
+        -u              display all terminal processes with a long listing format */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,10 +26,10 @@
 int main(int argc, char **argv){
 
 struct option longopts [] = {
-	{ "all", no_argument , NULL , 'a' },
-	{ "help", no_argument , NULL , 'h' },
-	{ 0, no_argument , NULL , 'u' },
-	{ 0, 0, 0, 0 }
+    { "all", no_argument , NULL , 'a' },
+    { "help", no_argument , NULL , 'h' },
+    { 0, no_argument , NULL , 'u' },
+    { 0, 0, 0, 0 }
 };
 
 struct linux_dirent {
@@ -69,58 +69,58 @@ char d_type;
 /* Function that breaks a buffer into a series of tokens
    using the delimiter delim */
 char **split_buffer(char *buffer){
-	const char *delim = " ";
-	char *token;
-	char **tokens = malloc(1024 * sizeof(char*));
-	int i = 0;
-	// get the first token
-	token  = strtok(buffer, delim);
-	tokens[0] = token;
-	// walk through other tokens and store them
-	while(token != NULL){
-		token  = strtok(NULL, delim);
-		tokens[++i] = token;
-	}
-	return tokens;
+    const char *delim = " ";
+    char *token;
+    char **tokens = malloc(1024 * sizeof(char*));
+    int i = 0;
+    // get the first token
+    token  = strtok(buffer, delim);
+    tokens[0] = token;
+    // walk through other tokens and store them
+    while(token != NULL){
+        token  = strtok(NULL, delim);
+        tokens[++i] = token;
+    }
+    return tokens;
 }
 
 struct ttyids who(void){
-	char session_id[128];
-	char **tty = malloc(64 * sizeof(char*));
-	char **ids = malloc(64 * sizeof(char*));
-	const int logsize = 16;
-	int who_file;
-	struct stat who_fileStat;
-	// open utmp file and get the file descriptor who_file
-	who_file = open("/var/run/utmp", O_RDONLY);
-	struct utmp log[logsize];
-	// read the file with who_file and store its contents into an array of struct utmp
-	read(who_file, &log, logsize * sizeof (struct utmp));
-	for(int i = 0; i < logsize; i++){
-		// use only user processes
-		if((&log[i])->ut_type == 7){
-			snprintf(session_id, sizeof(session_id), "%d", (&log[i])->ut_session);
-			// retrieve session ids and tty names of user processes
-			ids[j] = malloc(5 * sizeof(char));
-			tty[j] = malloc(16 * sizeof(char));
-			// store into ids and ttys
-			strcpy(ids[j], session_id);
-			strcpy(tty[j], (&log[i])->ut_line);
-			j++;
-		}
-	}
-	struct ttyids t = {tty, ids};
-	return t;
+    char session_id[128];
+    char **tty = malloc(64 * sizeof(char*));
+    char **ids = malloc(64 * sizeof(char*));
+    const int logsize = 16;
+    int who_file;
+    struct stat who_fileStat;
+    // open utmp file and get the file descriptor who_file
+    who_file = open("/var/run/utmp", O_RDONLY);
+    struct utmp log[logsize];
+    // read the file with who_file and store its contents into an array of struct utmp
+    read(who_file, &log, logsize * sizeof (struct utmp));
+    for(int i = 0; i < logsize; i++){
+        // use only user processes
+        if((&log[i])->ut_type == 7){
+            snprintf(session_id, sizeof(session_id), "%d", (&log[i])->ut_session);
+            // retrieve session ids and tty names of user processes
+            ids[j] = malloc(5 * sizeof(char));
+            tty[j] = malloc(16 * sizeof(char));
+            // store into ids and ttys
+            strcpy(ids[j], session_id);
+            strcpy(tty[j], (&log[i])->ut_line);
+            j++;
+        }
+    }
+    struct ttyids t = {tty, ids};
+    return t;
 }
 
 void ps(void){
     char *dev_tty;
     char *current_tty;
-	struct ttyids t = who();
-	// open proc directory and get the file descriptor
-	fd_proc = open(proc, O_RDONLY | O_DIRECTORY);
-	do{
-		/* reads several linux_dirent structures from the directory referred to 
+    struct ttyids t = who();
+    // open proc directory and get the file descriptor
+    fd_proc = open(proc, O_RDONLY | O_DIRECTORY);
+    do{
+        /* reads several linux_dirent structures from the directory referred to 
            by the open file descriptor fd_proc into the buffer pointed to by buf. */
         n = syscall(SYS_getdents, fd_proc, buf, 1024);
         for (int i = 0; i < n;) {
@@ -130,21 +130,21 @@ void ps(void){
             strncpy(file_name, namelist->d_name, 254);
             // ignore entries starting by "."
             if(file_name[0] !=  '.'){
-            	// use entries starting with a digit
-            	if(file_name[0] >= '0' && file_name[0] <= '9'){
-            		// use directories
-            		if(d_type == 4){
-            			//if(strcmp(file_name, "708") == 0){
-            			strncpy(proc_stat, proc, 254);
-            			// parsing the pid from the subdirectory name
-            			strcat(proc_stat, file_name);
-            			strcat(proc_stat, "/stat");
-            			// open /proc/pid/stat file and get the file descriptor
-            			fd = open(proc_stat, O_RDONLY);
-            			// read the file and store its contents into a buffer
-            			read(fd, buffer, sizeof(buffer));
-            			// split the buffer into fields in stat_infos
-            			stat_infos = split_buffer(buffer);
+                // use entries starting with a digit
+                if(file_name[0] >= '0' && file_name[0] <= '9'){
+                    // use directories
+                    if(d_type == 4){
+                        //if(strcmp(file_name, "708") == 0){
+                        strncpy(proc_stat, proc, 254);
+                        // parsing the pid from the subdirectory name
+                        strcat(proc_stat, file_name);
+                        strcat(proc_stat, "/stat");
+                        // open /proc/pid/stat file and get the file descriptor
+                        fd = open(proc_stat, O_RDONLY);
+                        // read the file and store its contents into a buffer
+                        read(fd, buffer, sizeof(buffer));
+                        // split the buffer into fields in stat_infos
+                        stat_infos = split_buffer(buffer);
                         // get the pathname of current tty
                         if ((dev_tty = ttyname(STDIN_FILENO)) == NULL)
                             perror("ttyname() error");
@@ -152,101 +152,101 @@ void ps(void){
                             current_tty = strtok(dev_tty, "/dev/");
                             //printf("%s ", current_tty);
                         }
-            			// walk through session ids retrived from who()
-            			for(int k = 0; k < j; k++){
-            				// use only the processes that are user processes from all terminals
-            				if(strcmp(t.ids[k], stat_infos[5]) == 0){
+                        // walk through session ids retrived from who()
+                        for(int k = 0; k < j; k++){
+                            // use only the processes that are user processes from all terminals
+                            if(strcmp(t.ids[k], stat_infos[5]) == 0){
                                 // print only the processes that are connected to the current terminal tty
                                 if(strcmp(t.ttys[k], current_tty) == 0){
                                     // print process id, tty name, command name
                                     printf("%s    %s    %s\n", stat_infos[0], t.ttys[k], stat_infos[1]);
                                 }
-            				}
-            			}
-						close(fd);
-						//}
-            		}
-            	}
+                            }
+                        }
+                        close(fd);
+                        //}
+                    }
+                }
             }
             i += namelist->d_reclen;
         }
-	}while(n > 0);
+    }while(n > 0);
 }
 
 void ps_a(void){
-	struct ttyids t = who();
-	fd_proc = open(proc, O_RDONLY | O_DIRECTORY);
-	do{
+    struct ttyids t = who();
+    fd_proc = open(proc, O_RDONLY | O_DIRECTORY);
+    do{
         n = syscall(SYS_getdents, fd_proc, buf, 1024);
         for (int i = 0; i < n;) {
             namelist = (struct linux_dirent *) (buf + i);
             d_type = *(buf + i + namelist->d_reclen - 1);
             strncpy(file_name, namelist->d_name, 254);
             if(file_name[0] !=  '.'){
-            	if(file_name[0] >= '0' && file_name[0] <= '9'){
-            		if(d_type == 4){
-            			strncpy(proc_stat, proc, 254);
-            			strcat(proc_stat, file_name);
-            			strcat(proc_stat, "/stat");
-            			fd = open(proc_stat, O_RDONLY);
-            			read(fd, buffer, sizeof(buffer));
-            			stat_infos = split_buffer(buffer);
-            			for(int k = 0; k < j; k++){
-            				// print only the processes that are user processes from all terminals
-            				if(strcmp(t.ids[k], stat_infos[5]) == 0){
-            					printf("%s    %s    %s\n", stat_infos[0], t.ttys[k], stat_infos[1]);
-            				}
-            			}
-						close(fd);
-            		}
-            	}
+                if(file_name[0] >= '0' && file_name[0] <= '9'){
+                    if(d_type == 4){
+                        strncpy(proc_stat, proc, 254);
+                        strcat(proc_stat, file_name);
+                        strcat(proc_stat, "/stat");
+                        fd = open(proc_stat, O_RDONLY);
+                        read(fd, buffer, sizeof(buffer));
+                        stat_infos = split_buffer(buffer);
+                        for(int k = 0; k < j; k++){
+                            // print only the processes that are user processes from all terminals
+                            if(strcmp(t.ids[k], stat_infos[5]) == 0){
+                                printf("%s    %s    %s\n", stat_infos[0], t.ttys[k], stat_infos[1]);
+                            }
+                        }
+                        close(fd);
+                    }
+                }
             }
             i += namelist->d_reclen;
         }
-	}while(n > 0);
+    }while(n > 0);
 }
 
 void ps_u(void){
-	struct ttyids t = who();
-	fd_proc = open(proc, O_RDONLY | O_DIRECTORY);
-	do{
+    struct ttyids t = who();
+    fd_proc = open(proc, O_RDONLY | O_DIRECTORY);
+    do{
         n = syscall(SYS_getdents, fd_proc, buf, 1024);
         for (int i = 0; i < n;) {
             namelist = (struct linux_dirent *) (buf + i);
             d_type = *(buf + i + namelist->d_reclen - 1);
             strncpy(file_name, namelist->d_name, 254);
             if(file_name[0] !=  '.'){
-            	if(file_name[0] >= '0' && file_name[0] <= '9'){
-            		if(d_type == 4){
-            			strncpy(proc_stat, proc, 254);
-            			strcat(proc_stat, file_name);
-            			strncpy(proc_cmdline, proc_stat, 254);
-            			strcat(proc_stat, "/stat");
-            			strcat(proc_cmdline, "/cmdline");
-            			fd = open(proc_stat, O_RDONLY);
-            			fd_cmd = open(proc_cmdline, O_RDONLY);
-            			read(fd, buffer, sizeof(buffer));
-            			read(fd_cmd, buffer_cmd, sizeof(buffer_cmd));
-            			stat_infos = split_buffer(buffer);
-            			for(int k = 0; k < j; k++){
-            				// print only the processes that are user processes from all terminals
-            				if(strcmp(t.ids[k], stat_infos[5]) == 0){
-            					// process id, resident set size, tty name, process state, cmdline(complete command line for the process)
-            					printf("%s    %s    %s    %s    %s\n", stat_infos[0], stat_infos[23], t.ttys[k], stat_infos[2], buffer_cmd);
-            				}
-            			}
-						close(fd);
-            		}
-            	}
+                if(file_name[0] >= '0' && file_name[0] <= '9'){
+                    if(d_type == 4){
+                        strncpy(proc_stat, proc, 254);
+                        strcat(proc_stat, file_name);
+                        strncpy(proc_cmdline, proc_stat, 254);
+                        strcat(proc_stat, "/stat");
+                        strcat(proc_cmdline, "/cmdline");
+                        fd = open(proc_stat, O_RDONLY);
+                        fd_cmd = open(proc_cmdline, O_RDONLY);
+                        read(fd, buffer, sizeof(buffer));
+                        read(fd_cmd, buffer_cmd, sizeof(buffer_cmd));
+                        stat_infos = split_buffer(buffer);
+                        for(int k = 0; k < j; k++){
+                            // print only the processes that are user processes from all terminals
+                            if(strcmp(t.ids[k], stat_infos[5]) == 0){
+                                // process id, resident set size, tty name, process state, cmdline(complete command line for the process)
+                                printf("%s    %s    %s    %s    %s\n", stat_infos[0], stat_infos[23], t.ttys[k], stat_infos[2], buffer_cmd);
+                            }
+                        }
+                        close(fd);
+                    }
+                }
             }
             i += namelist->d_reclen;
         }
-	}while(n > 0);
+    }while(n > 0);
 }
 
 /* Function that prints the help */
 void help(void){
-	printf(BOLD "USAGE\n" RESET);
+    printf(BOLD "USAGE\n" RESET);
     printf("    myps [options]\n\n");
     printf(BOLD "DESCRIPTION\n" RESET);
     printf("    Report a snapshot of the current processes.\n\n");
@@ -264,45 +264,45 @@ void help(void){
 }
 
 while ((c = getopt_long (argc, argv, "ahu", longopts, NULL)) != -1) {
-	switch (c) {
-	case 'a':
-		do_all = 1;
-		break ;
+    switch (c) {
+    case 'a':
+        do_all = 1;
+        break ;
     case 'h':
         do_help = 1;
         break ;
-	case 'u':
-		do_u = 1;
-		break ;
-	case 0:
-		break ;
-	case '?':
-	default : /* invalid option */
-		fprintf (stderr, "%s: option ‘-%c’ is invalid : ignored, try --help to get the command syntax.  \n",
-		argv[1], optopt);
-		invalid_option = 1;
-		break ;
-	case -1:
-		break;
-	}
+    case 'u':
+        do_u = 1;
+        break ;
+    case 0:
+        break ;
+    case '?':
+    default : /* invalid option */
+        fprintf (stderr, "%s: option ‘-%c’ is invalid : ignored, try --help to get the command syntax.  \n",
+        argv[1], optopt);
+        invalid_option = 1;
+        break ;
+    case -1:
+        break;
+    }
 }
 
 if(invalid_option == 0){
     if(do_help == 1){
         help();
     }
-	else if(do_all == 1 && do_u == 0){
-		ps_a();
-	}
-	else if(do_all == 0 && do_u == 1){
-		ps_u();
-	}
+    else if(do_all == 1 && do_u == 0){
+        ps_a();
+    }
+    else if(do_all == 0 && do_u == 1){
+        ps_u();
+    }
     else if(do_all == 1 && do_u == 1){
         ps_u();
     }
-	else if(do_all == 0 && do_u == 0){
-		ps();
-	}
+    else if(do_all == 0 && do_u == 0){
+        ps();
+    }
 }
 
 }

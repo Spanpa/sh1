@@ -21,7 +21,7 @@
 
 #define BLUE        "\x1b[34m"
 #define YELLOW      "\x1b[33m"
-#define BOLD 	    "\x1b[1m"
+#define BOLD        "\x1b[1m"
 #define RESET       "\x1b[0m"
 
 int main(int argc, char **argv){
@@ -513,33 +513,33 @@ void help(void){
 }
 
 while ((c = getopt_long (argc, argv, "ahlR", longopts, NULL)) != -1) {
-	switch (c) {
-	case 'a':
-		do_all = 1;
-		ls_value = argv[2];
-		break ;
+    switch (c) {
+    case 'a':
+        do_all = 1;
+        ls_value = argv[2];
+        break ;
     case 'h':
         do_help = 1;
         break ;
-	case 'l':
-		do_l = 1;
-		ls_value = argv[2];
-		break ;
-	case 'R':
-		do_recursive = 1;
-		ls_value = argv[2];
-		break ;
-	case 0: /* getopt_long () set a variable , just keep going */
-		break ;
-	case '?':
-	default : /* invalid option */
-		fprintf (stderr, "%s: option ‘-%c’ is invalid : ignored, try --help to get the command syntax.  \n",
-		argv[1], optopt);
+    case 'l':
+        do_l = 1;
+        ls_value = argv[2];
+        break ;
+    case 'R':
+        do_recursive = 1;
+        ls_value = argv[2];
+        break ;
+    case 0: /* getopt_long () set a variable , just keep going */
+        break ;
+    case '?':
+    default : /* invalid option */
+        fprintf (stderr, "%s: option ‘-%c’ is invalid : ignored, try --help to get the command syntax.  \n",
+        argv[1], optopt);
         invalid_option = 1;
-		break ;
-	case -1:
-		break;
-	}
+        break ;
+    case -1:
+        break;
+    }
 }
 
 if(invalid_option == 0){

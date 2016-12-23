@@ -1,16 +1,16 @@
 /*  ECAM 2016
-	Othman MEJDOUBI & Zakaria CHIHI
-	mywho : Print information about users who are currently logged in.
-	usage : mywho [option]
-	8 options(including 5 additional) :
-    	-a, --all 		print all processes
-    	-b, --boot 		time of last system boot
-    	-d, --dead 		print dead processes
-    	-h, --help  	display the help
-    	-l, --login  	print system login processes
-    	-q, --count  	all login names and number of users logged on
-    	-r, --runlevel  print current runlevel
-    	-u, --users  	list users logged in */
+    Othman MEJDOUBI & Zakaria CHIHI
+    mywho : Print information about users who are currently logged in.
+    usage : mywho [option]
+    8 options(including 5 additional) :
+        -a, --all       print all processes
+        -b, --boot      time of last system boot
+        -d, --dead      print dead processes
+        -h, --help      display the help
+        -l, --login     print system login processes
+        -q, --count     all login names and number of users logged on
+        -r, --runlevel  print current runlevel
+        -u, --users     list users logged in */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,123 +54,123 @@ struct utmp log[logsize];
 read(fd, &log, logsize * sizeof (struct utmp));
 
 struct option longopts [] = {
-	{ "all", no_argument , NULL , 'a' },
-	{ "boot", no_argument , NULL , 'b' },
-	{ "dead", no_argument , NULL , 'd' },
-	{ "help", no_argument , NULL , 'h' },
-	{ "login", no_argument , NULL , 'l' },
-	{ "count", no_argument , NULL , 'q' },
-	{ "runlevel", no_argument , NULL , 'r' },
-	{ "users", no_argument , NULL , 'u' },
-	{ 0, 0, 0, 0 }
+    { "all", no_argument , NULL , 'a' },
+    { "boot", no_argument , NULL , 'b' },
+    { "dead", no_argument , NULL , 'd' },
+    { "help", no_argument , NULL , 'h' },
+    { "login", no_argument , NULL , 'l' },
+    { "count", no_argument , NULL , 'q' },
+    { "runlevel", no_argument , NULL , 'r' },
+    { "users", no_argument , NULL , 'u' },
+    { 0, 0, 0, 0 }
 };
 
 // Prints only login and user processes
 void who(void){
-	for(int i = 0; i < logsize; i++){
-		if((&log[i])->ut_type == 6 || (&log[i])->ut_type == 7){
-			time = (&log[i])->ut_tv.tv_sec;
-			strftime(time_buff, 100, "%F %H:%M", localtime(&time));
-			printf("%s   %s         %s\n", (&log[i])->ut_user, (&log[i])->ut_line, time_buff);
-		}
-	} 
+    for(int i = 0; i < logsize; i++){
+        if((&log[i])->ut_type == 6 || (&log[i])->ut_type == 7){
+            time = (&log[i])->ut_tv.tv_sec;
+            strftime(time_buff, 100, "%F %H:%M", localtime(&time));
+            printf("%s   %s         %s\n", (&log[i])->ut_user, (&log[i])->ut_line, time_buff);
+        }
+    } 
 }
 
 // Prints time of system boot, runlevel, init, login user and dead processes
 void who_a(void){
-	runlevel = 0;
-	for(int i = 0; i < logsize; i++){
-		time = (&log[i])->ut_tv.tv_sec;
-		strftime(time_buff, 100, "%F %H:%M", localtime(&time));
-		// time of system boot 2 (in ut_tv)
-		if((&log[i])->ut_type == 2){
-			printf("         system boot  %s\n", time_buff);
-		}
-		// actual system runlevel
-		if((&log[i])->ut_type == 1 && runlevel == 0){
-			printf("         %s %c   %s\n", (&log[i])->ut_user, (&log[i])->ut_pid % 256, time_buff);
-			runlevel++;
-		}
-		// init, login, user and dead process
-		if((&log[i])->ut_type == 5 || (&log[i])->ut_type == 6 || (&log[i])->ut_type == 7 || (&log[i])->ut_type == 8){
-			printf("%s   %s         %s         %d\n", (&log[i])->ut_user, (&log[i])->ut_line, time_buff, (&log[i])->ut_pid);
-		}
-	} 
+    runlevel = 0;
+    for(int i = 0; i < logsize; i++){
+        time = (&log[i])->ut_tv.tv_sec;
+        strftime(time_buff, 100, "%F %H:%M", localtime(&time));
+        // time of system boot 2 (in ut_tv)
+        if((&log[i])->ut_type == 2){
+            printf("         system boot  %s\n", time_buff);
+        }
+        // actual system runlevel
+        if((&log[i])->ut_type == 1 && runlevel == 0){
+            printf("         %s %c   %s\n", (&log[i])->ut_user, (&log[i])->ut_pid % 256, time_buff);
+            runlevel++;
+        }
+        // init, login, user and dead process
+        if((&log[i])->ut_type == 5 || (&log[i])->ut_type == 6 || (&log[i])->ut_type == 7 || (&log[i])->ut_type == 8){
+            printf("%s   %s         %s         %d\n", (&log[i])->ut_user, (&log[i])->ut_line, time_buff, (&log[i])->ut_pid);
+        }
+    } 
 }
 
 // Time of system boot 2 (in ut_tv)
 void who_b(void){
-	for(int i = 0; i < logsize; i++){
-		if((&log[i])->ut_type == 2){
-			time = (&log[i])->ut_tv.tv_sec;
-			strftime(time_buff, 100, "%F %H:%M", localtime(&time));
-			printf("         system boot  %s\n", time_buff);
-		}
-	} 
+    for(int i = 0; i < logsize; i++){
+        if((&log[i])->ut_type == 2){
+            time = (&log[i])->ut_tv.tv_sec;
+            strftime(time_buff, 100, "%F %H:%M", localtime(&time));
+            printf("         system boot  %s\n", time_buff);
+        }
+    } 
 }
 
 // Terminated process 8
 void who_d(void){
-	for(int i = 0; i < logsize; i++){
-		if((&log[i])->ut_type == 8){
-			time = (&log[i])->ut_tv.tv_sec;
-			strftime(time_buff, 100, "%F %H:%M", localtime(&time));
-			printf("%s   %s         %s         %d\n", (&log[i])->ut_user, (&log[i])->ut_line, time_buff, (&log[i])->ut_pid);
-		}
-	} 
+    for(int i = 0; i < logsize; i++){
+        if((&log[i])->ut_type == 8){
+            time = (&log[i])->ut_tv.tv_sec;
+            strftime(time_buff, 100, "%F %H:%M", localtime(&time));
+            printf("%s   %s         %s         %d\n", (&log[i])->ut_user, (&log[i])->ut_line, time_buff, (&log[i])->ut_pid);
+        }
+    } 
 }
 
 // Session leader process for user login 6
 void who_l(void){
-	for(int i = 0; i < logsize; i++){
-		if((&log[i])->ut_type == 6){
-			time = (&log[i])->ut_tv.tv_sec;
-			strftime(time_buff, 100, "%F %H:%M", localtime(&time));
-			printf("%s   %s         %s         %d\n", (&log[i])->ut_user, (&log[i])->ut_line, time_buff, (&log[i])->ut_pid);
-		}
-	} 
+    for(int i = 0; i < logsize; i++){
+        if((&log[i])->ut_type == 6){
+            time = (&log[i])->ut_tv.tv_sec;
+            strftime(time_buff, 100, "%F %H:%M", localtime(&time));
+            printf("%s   %s         %s         %d\n", (&log[i])->ut_user, (&log[i])->ut_line, time_buff, (&log[i])->ut_pid);
+        }
+    } 
 }
 
 // Normal user processes 7 and count
 void who_q(void){
-	int count = 0;
-	for(int i = 0; i < logsize; i++){
-		if((&log[i])->ut_type == 7){
-			printf("%s ", (&log[i])->ut_user);
-			count++;
-		}
-	}
-	// print number of normal users
-	printf("\n# users=%d\n", count);
+    int count = 0;
+    for(int i = 0; i < logsize; i++){
+        if((&log[i])->ut_type == 7){
+            printf("%s ", (&log[i])->ut_user);
+            count++;
+        }
+    }
+    // print number of normal users
+    printf("\n# users=%d\n", count);
 }
 
 // Actual system runlevel
 void who_r(void){
-	runlevel = 0;
-	for(int i = 0; i < logsize; i++){
-		time = (&log[i])->ut_tv.tv_sec;
-		strftime(time_buff, 100, "%F %H:%M", localtime(&time));
-		if((&log[i])->ut_type == 1 && runlevel == 0){
-			printf("         %s %c   %s\n", (&log[i])->ut_user, (&log[i])->ut_pid % 256, time_buff);
-			runlevel++;
-		}
-	} 
+    runlevel = 0;
+    for(int i = 0; i < logsize; i++){
+        time = (&log[i])->ut_tv.tv_sec;
+        strftime(time_buff, 100, "%F %H:%M", localtime(&time));
+        if((&log[i])->ut_type == 1 && runlevel == 0){
+            printf("         %s %c   %s\n", (&log[i])->ut_user, (&log[i])->ut_pid % 256, time_buff);
+            runlevel++;
+        }
+    } 
 }
 
 // Normal user processes 7
 void who_u(void){
-	for(int i = 0; i < logsize; i++){
-		if((&log[i])->ut_type == 7){
-			time = (&log[i])->ut_tv.tv_sec;
-			strftime(time_buff, 100, "%F %H:%M", localtime(&time));
-			printf("%s   %s         %s         %d\n", (&log[i])->ut_user, (&log[i])->ut_line, time_buff, (&log[i])->ut_pid);
-		}
-	} 
+    for(int i = 0; i < logsize; i++){
+        if((&log[i])->ut_type == 7){
+            time = (&log[i])->ut_tv.tv_sec;
+            strftime(time_buff, 100, "%F %H:%M", localtime(&time));
+            printf("%s   %s         %s         %d\n", (&log[i])->ut_user, (&log[i])->ut_line, time_buff, (&log[i])->ut_pid);
+        }
+    } 
 }
 
 /* Function that prints the help */
 void help(void){
-	printf(BOLD "USAGE\n" RESET);
+    printf(BOLD "USAGE\n" RESET);
     printf("    mywho [option]\n\n");
     printf(BOLD "DESCRIPTION\n" RESET);
     printf("    Print information about users who are currently logged in.\n\n");
@@ -199,82 +199,82 @@ void help(void){
 }
 
 while ((c = getopt_long (argc, argv, "abdhlqru", longopts, NULL)) != -1) {
-	switch (c) {
-	case 'a':
-		do_all = 1;
-		break ;
-	case 'b':
-		do_boot = 1;
-		break ;
-	case 'd':
-		do_dead = 1;
-		break ;
-	case 'h':
-		do_help = 1;
-		break ;
-	case 'l':
-		do_login = 1;
-		break ;
-	case 'q':
-		do_count = 1;
-		break ;
-	case 'r':
-		do_runlevel = 1;
-		break ;
-	case 'u':
-		do_users = 1;
-		break ;
-	case 0:
-		break ;
-	case '?':
-	default : /* invalid option */
-		fprintf (stderr, "%s: option ‘-%c’ is invalid : ignored, try --help to get the command syntax.  \n",
-		argv[1], optopt);
-		invalid_option = 1;
-		break ;
-	case -1:
-		break;
-	}
+    switch (c) {
+    case 'a':
+        do_all = 1;
+        break ;
+    case 'b':
+        do_boot = 1;
+        break ;
+    case 'd':
+        do_dead = 1;
+        break ;
+    case 'h':
+        do_help = 1;
+        break ;
+    case 'l':
+        do_login = 1;
+        break ;
+    case 'q':
+        do_count = 1;
+        break ;
+    case 'r':
+        do_runlevel = 1;
+        break ;
+    case 'u':
+        do_users = 1;
+        break ;
+    case 0:
+        break ;
+    case '?':
+    default : /* invalid option */
+        fprintf (stderr, "%s: option ‘-%c’ is invalid : ignored, try --help to get the command syntax.  \n",
+        argv[1], optopt);
+        invalid_option = 1;
+        break ;
+    case -1:
+        break;
+    }
 }
 if(invalid_option == 0){
-	// who -a
-	if(do_all == 1 && do_count == 0){
-    	who_a();
-	}
-	// who -b
-	if(do_all == 0 && do_boot == 1 && do_count == 0){
-    	who_b();
-	}
-	// who -d
-	if(do_all == 0 && do_dead == 1 && do_count == 0){
-    	who_d();
-	}
-	// who -h
-	if(do_all == 0 && do_boot == 0 && do_dead == 0 && do_help == 1 && do_login == 0 
-		&& do_count == 0 && do_runlevel == 0 && do_users == 0){
-    	help();
-	}
-	// who -l
-	if(do_all == 0 && do_login == 1 && do_count == 0){
-    	who_l();
-	}
-	// who -q
-	if(do_count == 1){
-   		who_q();
-	}
-	// who -r
-	if(do_all == 0 && do_runlevel == 1 && do_count == 0){
-    	who_r();
-	}
-	// who -u
-	if(do_all == 0 && do_count == 0 && do_users == 1){
-    	who_u();
-	}
-	// who
-	if(do_all == 0 && do_boot == 0 && do_dead == 0 && do_help == 0 && do_login == 0 
-		&& do_count == 0 && do_runlevel == 0 && do_users == 0 && invalid_option == 0){
-		who();
-	}
+    // who -a
+    if(do_all == 1 && do_count == 0){
+        who_a();
+    }
+    // who -b
+    if(do_all == 0 && do_boot == 1 && do_count == 0){
+        who_b();
+    }
+    // who -d
+    if(do_all == 0 && do_dead == 1 && do_count == 0){
+        who_d();
+    }
+    // who -h
+    if(do_all == 0 && do_boot == 0 && do_dead == 0 && do_help == 1 && do_login == 0 
+        && do_count == 0 && do_runlevel == 0 && do_users == 0){
+        help();
+    }
+    // who -l
+    if(do_all == 0 && do_login == 1 && do_count == 0){
+        who_l();
+    }
+    // who -q
+    if(do_count == 1){
+        who_q();
+    }
+    // who -r
+    if(do_all == 0 && do_runlevel == 1 && do_count == 0){
+        who_r();
+    }
+    // who -u
+    if(do_all == 0 && do_count == 0 && do_users == 1){
+        who_u();
+    }
+    // who
+    if(do_all == 0 && do_boot == 0 && do_dead == 0 && do_help == 0 && do_login == 0 
+        && do_count == 0 && do_runlevel == 0 && do_users == 0 && invalid_option == 0){
+        who();
+    }
 }
 
 }
