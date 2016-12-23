@@ -61,6 +61,14 @@ char full_path[255];
 char time_buff[100];
 char d_type;
 
+/* Check if a file given its pathname is a regular file */
+int is_regular_file(char *path){
+    struct stat path_stat;
+    // stats the file pointed to by path and fills in path_stat
+    stat(path, &path_stat);
+    return S_ISREG(path_stat.st_mode);
+}
+
 void file_stat(void){
     // stats the file pointed to by full_path and fills in fileStat
     stat(full_path, &fileStat);
@@ -91,35 +99,40 @@ void ls(char *path){
         file_path = ".";
     }
     // open file_path file or directory and get the file descriptor
-    fd = open(file_path, O_RDONLY | O_DIRECTORY);
-
-    do{
-        /* reads several linux_dirent structures from the directory referred to 
-           by the open file descriptor fd into the buffer pointed to by buf. */
-        n = syscall(SYS_getdents, fd, buf, 1024);
-        if(n == -1){
-            printf("Error : Unknown directory.");
-        }
-        for(int i = 0; i < n;) {
-            namelist = (struct linux_dirent *) (buf + i);
-            // store file type in d_type
-            d_type = *(buf + i + namelist->d_reclen - 1);
-            strncpy(file_name, namelist->d_name, 254);
-            // ignore entries starting by "."
-            if(file_name[0] !=  '.'){
-                // print directory entries in blue
-            	if(d_type == 4){
-            		printf(BLUE BOLD    "%s "     RESET, namelist->d_name);
-            	}
-                // print file entries
-            	else {
-            		printf("%s ", namelist->d_name);
-            	}
+    fd = open(file_path, O_RDONLY);
+    if(fd == -1){
+        printf("myls: cannot access'%s': No such file or directory\n", file_path);
+    }
+    else if(is_regular_file(file_path)){
+        // print file name when the file is a regular file
+        printf("%s\n", file_path);
+    }
+    else {
+        do{
+            /* reads several linux_dirent structures from the directory referred to 
+                by the open file descriptor fd into the buffer pointed to by buf. */
+            n = syscall(SYS_getdents, fd, buf, 1024);
+            for(int i = 0; i < n;) {
+                namelist = (struct linux_dirent *) (buf + i);
+                // store file type in d_type
+                d_type = *(buf + i + namelist->d_reclen - 1);
+                strncpy(file_name, namelist->d_name, 254);
+                // ignore entries starting by "."
+                if(file_name[0] !=  '.'){
+                    // print directory entries in blue
+                    if(d_type == 4){
+                        printf(BLUE BOLD    "%s "     RESET, namelist->d_name);
+                    }
+                    // print file entries
+                    else {
+                        printf("%s ", namelist->d_name);
+                    }
+                }
+                i += namelist->d_reclen;
             }
-            i += namelist->d_reclen;
-        }
-	}while(n > 0);
-    printf("\n");
+        }while(n > 0);
+        printf("\n");
+    }
 }
 
 void ls_a(void){
@@ -130,28 +143,32 @@ void ls_a(void){
         file_path = ls_value;
     }
 
-    fd = open(file_path, O_RDONLY | O_DIRECTORY);
-
-    do{
-        n = syscall(SYS_getdents, fd, buf, 1024);
-        if(n == -1){
-            printf("Error : Unknown directory.");
-        }
-        for (int i = 0; i < n;) {
-            namelist = (struct linux_dirent *) (buf + i);
-            d_type = *(buf + i + namelist->d_reclen - 1);
-            strncpy(file_name, namelist->d_name, 254);
-            // does not ignore entries starting by "."
-            if(d_type == 4){
-                printf(BLUE BOLD    "%s "     RESET, namelist->d_name);
+    fd = open(file_path, O_RDONLY);
+    if(fd == -1){
+        printf("myls: cannot access'%s': No such file or directory\n", file_path);
+    }
+    else if(is_regular_file(file_path)){
+        printf("%s\n", file_path);
+    }
+    else {
+        do{
+            n = syscall(SYS_getdents, fd, buf, 1024);
+            for (int i = 0; i < n;) {
+                namelist = (struct linux_dirent *) (buf + i);
+                d_type = *(buf + i + namelist->d_reclen - 1);
+                strncpy(file_name, namelist->d_name, 254);
+                // does not ignore entries starting by "."
+                if(d_type == 4){
+                    printf(BLUE BOLD    "%s "     RESET, namelist->d_name);
+                }
+                else {
+                    printf("%s ", namelist->d_name);
+                }
+                i += namelist->d_reclen;
             }
-            else {
-                printf("%s ", namelist->d_name);
-            }
-            i += namelist->d_reclen;
-        }
-    }while(n > 0);
-    printf("\n");
+        }while(n > 0);
+        printf("\n");
+    }
 }
 
 void ls_l(void){
@@ -162,40 +179,47 @@ void ls_l(void){
         file_path = ls_value;
     }
 
-    fd = open(file_path, O_RDONLY | O_DIRECTORY);
-
-    do{
-        n = syscall(SYS_getdents, fd, buf, 1024);
-        if(n == -1){
-            printf("Error : Unknown directory.\n");
-        }
-        for (int i = 0; i < n;) {
-            strncpy(full_path, file_path, 254);
-            namelist = (struct linux_dirent *) (buf + i);
-            d_type = *(buf + i + namelist->d_reclen - 1);
-            strncpy(file_name, namelist->d_name, 254);
-            if(file_name[0] !=  '.'){
-                // verifies the full path
-                if(full_path[(strlen(full_path)-1)] == '/'){
-                    strcat(full_path, namelist->d_name);
+    fd = open(file_path, O_RDONLY);
+    if(fd == -1){
+        printf("myls: cannot access'%s': No such file or directory\n", file_path);
+    }
+    else if(is_regular_file(file_path)){
+        strncpy(full_path, file_path, 254);
+        // prints file stats
+        file_stat();
+        printf("%s\n", file_path);
+    }
+    else {
+        do{
+            n = syscall(SYS_getdents, fd, buf, 1024);
+            for (int i = 0; i < n;) {
+                strncpy(full_path, file_path, 254);
+                namelist = (struct linux_dirent *) (buf + i);
+                d_type = *(buf + i + namelist->d_reclen - 1);
+                strncpy(file_name, namelist->d_name, 254);
+                if(file_name[0] !=  '.'){
+                    // verifies the full path
+                    if(full_path[(strlen(full_path)-1)] == '/'){
+                        strcat(full_path, namelist->d_name);
+                    }
+                    else {
+                        strcat(full_path, "/");
+                        strcat(full_path, namelist->d_name);
+                    }   
+                    // prints file stats
+                    file_stat();
+                    if(d_type == 4){
+                        printf(BLUE BOLD    "%s "     RESET, namelist->d_name);
+                    }
+                    else {
+                        printf("%s ", namelist->d_name);
+                    }
+                    printf("\n");
                 }
-                else {
-                    strcat(full_path, "/");
-                    strcat(full_path, namelist->d_name);
-                }
-                // prints file stats
-                file_stat();
-                if(d_type == 4){
-                    printf(BLUE BOLD    "%s "     RESET, namelist->d_name);
-                }
-                else {
-                    printf("%s ", namelist->d_name);
-                }
-                printf("\n");
+                i += namelist->d_reclen;
             }
-            i += namelist->d_reclen;
-        }
-    }while(n > 0);
+        }while(n > 0);
+    }
 }
 
 void ls_R(char *path){
@@ -205,47 +229,51 @@ void ls_R(char *path){
         file_path = ".";
     }
 
-    fd = open(file_path, O_RDONLY | O_DIRECTORY);
-
-    do{
-        n = syscall(SYS_getdents, fd, buf, 1024);
-        if(n == -1){
-            printf("Error : Unknown directory.");
-        }
-        if(n > 0){  
-            printf("%s:\n", file_path);
-        }
-        for (int i = 0; i < n;) {
-            strncpy(full_path, file_path, 254);
-            namelist = (struct linux_dirent *) (buf + i);
-            d_type = *(buf + i + namelist->d_reclen - 1);
-            strncpy(file_name, namelist->d_name, 254);
-            if(file_name[0] !=  '.'){
-                if(d_type == 4){
-                    printf(BLUE BOLD    "%s "     RESET, namelist->d_name);
-                    if(full_path[(strlen(full_path)-1)] == '/'){
-                        strcat(full_path, namelist->d_name);
+    fd = open(file_path, O_RDONLY);
+    if(fd == -1){
+        printf("myls: cannot access'%s': No such file or directory\n", file_path);
+    }
+    else if(is_regular_file(file_path)){
+        printf("%s\n", file_path);
+    }
+    else {
+        do{
+            n = syscall(SYS_getdents, fd, buf, 1024);
+            if(n > 0){  
+                printf("%s:\n", file_path);
+            }
+            for (int i = 0; i < n;) {
+                strncpy(full_path, file_path, 254);
+                namelist = (struct linux_dirent *) (buf + i);
+                d_type = *(buf + i + namelist->d_reclen - 1);
+                strncpy(file_name, namelist->d_name, 254);
+                if(file_name[0] !=  '.'){
+                    if(d_type == 4){
+                        printf(BLUE BOLD    "%s "     RESET, namelist->d_name);
+                        if(full_path[(strlen(full_path)-1)] == '/'){
+                            strcat(full_path, namelist->d_name);
+                        }
+                        else {
+                            strcat(full_path, "/");
+                            strcat(full_path, namelist->d_name);
+                        }
+                        // every subdirectory found in file_path is stored in directories
+                        directories[j] = malloc(64 * sizeof(char));
+                        strcpy(directories[j], full_path);
+                        j++;
                     }
                     else {
-                        strcat(full_path, "/");
-                        strcat(full_path, namelist->d_name);
+                        printf("%s ", namelist->d_name);
                     }
-                    // every subdirectory found in file_path is stored in directories
-                    directories[j] = malloc(64 * sizeof(char));
-                    strcpy(directories[j], full_path);
-                    j++;
                 }
-                else {
-                    printf("%s ", namelist->d_name);
-                }
+                i += namelist->d_reclen;
             }
-            i += namelist->d_reclen;
+        }while(n > 0);
+        printf("\n\n");
+        // get entries of all subdirectories
+        for(int k = 0; k < j; k++){
+            ls_R(directories[k]);
         }
-    }while(n > 0);
-    printf("\n\n");
-    // get entries of all subdirectories
-    for(int k = 0; k < j; k++){
-        ls_R(directories[k]);
     }
 }
 
@@ -257,45 +285,49 @@ void ls_aR(char *path){
         file_path = ".";
     }
 
-    fd = open(file_path, O_RDONLY | O_DIRECTORY);
-
-    do{
-        n = syscall(SYS_getdents, fd, buf, 1024);
-        if(n == -1){
-            printf("Error : Unknown directory.");
-        }
-        if(n > 0){  
-            printf("%s:\n", file_path);
-        }
-        for (int i = 0; i < n;) {
-            strncpy(full_path, file_path, 254);
-            namelist = (struct linux_dirent *) (buf + i);
-            d_type = *(buf + i + namelist->d_reclen - 1);
-            strncpy(file_name, namelist->d_name, 254);
-            if(d_type == 4){
-                printf(BLUE BOLD    "%s "     RESET, namelist->d_name);
-                if(full_path[(strlen(full_path)-1)] == '/'){
-                    strcat(full_path, namelist->d_name);
+    fd = open(file_path, O_RDONLY);
+    if(fd == -1){
+        printf("myls: cannot access'%s': No such file or directory\n", file_path);
+    }
+    else if(is_regular_file(file_path)){
+        printf("%s\n", file_path);
+    }
+    else {
+        do{
+            n = syscall(SYS_getdents, fd, buf, 1024);
+            if(n > 0){  
+                printf("%s:\n", file_path);
+            }
+            for (int i = 0; i < n;) {
+                strncpy(full_path, file_path, 254);
+                namelist = (struct linux_dirent *) (buf + i);
+                d_type = *(buf + i + namelist->d_reclen - 1);
+                strncpy(file_name, namelist->d_name, 254);
+                if(d_type == 4){
+                    printf(BLUE BOLD    "%s "     RESET, namelist->d_name);
+                    if(full_path[(strlen(full_path)-1)] == '/'){
+                        strcat(full_path, namelist->d_name);
+                    }
+                    else {
+                        strcat(full_path, "/");
+                        strcat(full_path, namelist->d_name);
+                    }
+                    if(file_name[0] !=  '.'){
+                        directories[j] = malloc(64 * sizeof(char));
+                        strcpy(directories[j], full_path);
+                        j++;
+                    }
                 }
                 else {
-                    strcat(full_path, "/");
-                    strcat(full_path, namelist->d_name);
+                    printf("%s ", namelist->d_name);
                 }
-                if(file_name[0] !=  '.'){
-                    directories[j] = malloc(64 * sizeof(char));
-                    strcpy(directories[j], full_path);
-                    j++;
-                }
+                i += namelist->d_reclen;
             }
-            else {
-                printf("%s ", namelist->d_name);
-            }
-            i += namelist->d_reclen;
+        }while(n > 0);
+        printf("\n\n");
+        for(int k = 0; k < j; k++){
+            ls_aR(directories[k]);
         }
-    }while(n > 0);
-    printf("\n\n");
-    for(int k = 0; k < j; k++){
-        ls_aR(directories[k]);
     }
 }
 
@@ -306,47 +338,53 @@ void ls_lR(char *path){
         file_path = ".";
     }
 
-    fd = open(file_path, O_RDONLY | O_DIRECTORY);
-
-    do{
-        n = syscall(SYS_getdents, fd, buf, 1024);
-        if(n == -1){
-            printf("Error : Unknown directory.");
-        }
-        if(n > 0){  
-            printf("%s:\n", file_path);
-        }
-        for (int i = 0; i < n;) {
-            strncpy(full_path, file_path, 254);
-            namelist = (struct linux_dirent *) (buf + i);
-            d_type = *(buf + i + namelist->d_reclen - 1);
-            strncpy(file_name, namelist->d_name, 254);
-            if(file_name[0] !=  '.'){
-                if(full_path[(strlen(full_path)-1)] == '/'){
-                    strcat(full_path, namelist->d_name);
-                }
-                else {
-                    strcat(full_path, "/");
-                    strcat(full_path, namelist->d_name);
-                }
-                file_stat();
-                if(d_type == 4){
-                    printf(BLUE BOLD    "%s "     RESET, namelist->d_name);
-                    directories[j] = malloc(64 * sizeof(char));
-                    strcpy(directories[j], full_path);
-                    j++;
-                }
-                else {
-                    printf("%s ", namelist->d_name);
-                }
-                printf("\n");
+    fd = open(file_path, O_RDONLY);
+    if(fd == -1){
+        printf("myls: cannot access'%s': No such file or directory\n", file_path);
+    }
+    else if(is_regular_file(file_path)){
+        strncpy(full_path, file_path, 254);
+        file_stat();
+        printf("%s\n", file_path);
+    }
+    else {
+        do{
+            n = syscall(SYS_getdents, fd, buf, 1024);
+            if(n > 0){  
+                printf("%s:\n", file_path);
             }
-            i += namelist->d_reclen;
+            for (int i = 0; i < n;) {
+                strncpy(full_path, file_path, 254);
+                namelist = (struct linux_dirent *) (buf + i);
+                d_type = *(buf + i + namelist->d_reclen - 1);
+                strncpy(file_name, namelist->d_name, 254);
+                if(file_name[0] !=  '.'){
+                    if(full_path[(strlen(full_path)-1)] == '/'){
+                        strcat(full_path, namelist->d_name);
+                    }
+                    else {
+                        strcat(full_path, "/");
+                        strcat(full_path, namelist->d_name);
+                    }
+                    file_stat();
+                    if(d_type == 4){
+                        printf(BLUE BOLD    "%s "     RESET, namelist->d_name);
+                        directories[j] = malloc(64 * sizeof(char));
+                        strcpy(directories[j], full_path);
+                        j++;
+                    }
+                    else {
+                        printf("%s ", namelist->d_name);
+                    }
+                    printf("\n");
+                }
+                i += namelist->d_reclen;
+            }
+        }while(n > 0);
+        printf("\n");
+        for(int k = 0; k < j; k++){
+            ls_lR(directories[k]);
         }
-    }while(n > 0);
-    printf("\n");
-    for(int k = 0; k < j; k++){
-        ls_lR(directories[k]);
     }
 }
 
@@ -357,47 +395,53 @@ void ls_alR(char *path){
         file_path = ".";
     }
 
-    fd = open(file_path, O_RDONLY | O_DIRECTORY);
-
-    do{
-        n = syscall(SYS_getdents, fd, buf, 1024);
-        if(n == -1){
-            printf("Error : Unknown directory.");
-        }
-        if(n > 0){  
-            printf("%s:\n", file_path);
-        }
-        for (int i = 0; i < n;) {
-            strncpy(full_path, file_path, 254);
-            namelist = (struct linux_dirent *) (buf + i);
-            d_type = *(buf + i + namelist->d_reclen - 1);
-            strncpy(file_name, namelist->d_name, 254);
-            if(full_path[(strlen(full_path)-1)] == '/'){
-                strcat(full_path, namelist->d_name);
+    fd = open(file_path, O_RDONLY);
+    if(fd == -1){
+        printf("myls: cannot access'%s': No such file or directory\n", file_path);
+    }
+    else if(is_regular_file(file_path)){
+        strncpy(full_path, file_path, 254);
+        file_stat();
+        printf("%s\n", file_path);
+    }
+    else {
+        do{
+            n = syscall(SYS_getdents, fd, buf, 1024);
+            if(n > 0){  
+                printf("%s:\n", file_path);
             }
-            else {
-                strcat(full_path, "/");
-                strcat(full_path, namelist->d_name);
-            }
-            file_stat();
-            if(d_type == 4){
-                printf(BLUE BOLD    "%s "     RESET, namelist->d_name);
-                if(file_name[0] !=  '.'){
-                    directories[j] = malloc(64 * sizeof(char));
-                    strcpy(directories[j], full_path);
-                    j++;
+            for (int i = 0; i < n;) {
+                strncpy(full_path, file_path, 254);
+                namelist = (struct linux_dirent *) (buf + i);
+                d_type = *(buf + i + namelist->d_reclen - 1);
+                strncpy(file_name, namelist->d_name, 254);
+                if(full_path[(strlen(full_path)-1)] == '/'){
+                    strcat(full_path, namelist->d_name);
                 }
+                else {
+                    strcat(full_path, "/");
+                    strcat(full_path, namelist->d_name);
+                }
+                file_stat();
+                if(d_type == 4){
+                    printf(BLUE BOLD    "%s "     RESET, namelist->d_name);
+                    if(file_name[0] !=  '.'){
+                        directories[j] = malloc(64 * sizeof(char));
+                        strcpy(directories[j], full_path);
+                        j++;
+                    }
+                }
+                else {
+                    printf("%s ", namelist->d_name);
+                }
+                printf("\n");
+                i += namelist->d_reclen;
             }
-            else {
-                printf("%s ", namelist->d_name);
-            }
-            printf("\n");
-            i += namelist->d_reclen;
+        }while(n > 0);
+        printf("\n");
+        for(int k = 0; k < j; k++){
+            ls_alR(directories[k]);
         }
-    }while(n > 0);
-    printf("\n");
-    for(int k = 0; k < j; k++){
-        ls_alR(directories[k]);
     }
 }
 
@@ -409,36 +453,42 @@ void ls_al(void){
         file_path = ls_value;
     }
 
-    fd = open(file_path, O_RDONLY | O_DIRECTORY);
-
-    do{
-        n = syscall(SYS_getdents, fd, buf, 1024);
-        if(n == -1){
-            printf("Error : Unknown directory.\n");
-        }
-        for (int i = 0; i < n;) {
-            strncpy(full_path, file_path, 254);
-            namelist = (struct linux_dirent *) (buf + i);
-            d_type = *(buf + i + namelist->d_reclen - 1);
-            strncpy(file_name, namelist->d_name, 254);
-            if(full_path[(strlen(full_path)-1)] == '/'){
-                strcat(full_path, namelist->d_name);
+    fd = open(file_path, O_RDONLY);
+    if(fd == -1){
+        printf("myls: cannot access'%s': No such file or directory\n", file_path);
+    }
+    else if(is_regular_file(file_path)){
+        strncpy(full_path, file_path, 254);
+        file_stat();
+        printf("%s\n", file_path);
+    }
+    else {
+        do{
+            n = syscall(SYS_getdents, fd, buf, 1024);
+            for (int i = 0; i < n;) {
+                strncpy(full_path, file_path, 254);
+                namelist = (struct linux_dirent *) (buf + i);
+                d_type = *(buf + i + namelist->d_reclen - 1);
+                strncpy(file_name, namelist->d_name, 254);
+                if(full_path[(strlen(full_path)-1)] == '/'){
+                    strcat(full_path, namelist->d_name);
+                }
+                else {
+                    strcat(full_path, "/");
+                    strcat(full_path, namelist->d_name);
+                }
+                file_stat();
+                if(d_type == 4){
+                    printf(BLUE BOLD    "%s "     RESET, namelist->d_name);
+                }
+                else {
+                    printf("%s ", namelist->d_name);
+                }
+                printf("\n");
+                i += namelist->d_reclen;
             }
-            else {
-                strcat(full_path, "/");
-                strcat(full_path, namelist->d_name);
-            }
-            file_stat();
-            if(d_type == 4){
-                printf(BLUE BOLD    "%s "     RESET, namelist->d_name);
-            }
-            else {
-                printf("%s ", namelist->d_name);
-            }
-            printf("\n");
-            i += namelist->d_reclen;
-        }
-    }while(n > 0);
+        }while(n > 0);
+    }
 }
 
 /* Function that prints the help */
