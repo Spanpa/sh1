@@ -1,3 +1,0 @@
-src/main/resources/static/* linguist-vendored
-project_docs/* linguist-documentation
-*.rb linguist-language=C
