@@ -12,9 +12,9 @@ It includes the following spec/limitations :
 Contributing
 ------------
 
-ECAM 2016
+ECAM 2016-2017
 
-Othman MEJDOUBI & Zakariya CHIHI
+Othman MEJDOUBI & Zakaria CHIHI
 
 License
 -------
